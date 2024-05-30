@@ -6,13 +6,13 @@ import sys
 import time
 
 from .adapter.adb import ADB
-from .adapter.DroidInspect_app import DroidInspectAppConn
+from .adapter.droidbot_app import DroidBotAppConn
 from .adapter.logcat import Logcat
 from .adapter.minicap import Minicap
 from .adapter.process_monitor import ProcessMonitor
 from .adapter.telnet import TelnetConsole
 from .adapter.user_input_monitor import UserInputMonitor
-from .adapter.DroidInspect_ime import DroidInspectIme
+from .adapter.droidbot_ime import DroidBotIme
 from .app import App
 from .intent import Intent
 
@@ -73,22 +73,22 @@ class Device(object):
         # adapters
         self.adb = ADB(device=self)
         self.telnet = TelnetConsole(device=self, auth_token=telnet_auth_token)
-        self.DroidInspect_app = DroidInspectAppConn(device=self)
+        self.droidbot_app = DroidBotAppConn(device=self)
         self.minicap = Minicap(device=self)
         self.logcat = Logcat(device=self)
         self.user_input_monitor = UserInputMonitor(device=self)
         self.process_monitor = ProcessMonitor(device=self)
-        self.DroidInspect_ime = DroidInspectIme(device=self)
+        self.droidbot_ime = DroidBotIme(device=self)
 
         self.adapters = {
             self.adb: True,
             self.telnet: False,
-            self.DroidInspect_app: True,
+            self.droidbot_app: True,
             self.minicap: True,
             self.logcat: True,
             self.user_input_monitor: True,
             self.process_monitor: True,
-            self.DroidInspect_ime: True
+            self.droidbot_ime: True
         }
 
         # minicap currently not working on emulators
@@ -854,14 +854,14 @@ class Device(object):
         self.adb.drag(start_xy, end_xy, duration)
 
     def view_append_text(self, text):
-        if self.DroidInspect_ime.connected:
-            self.DroidInspect_ime.input_text(text=text, mode=1)
+        if self.droidbot_ime.connected:
+            self.droidbot_ime.input_text(text=text, mode=1)
         else:
             self.adb.type(text)
 
     def view_set_text(self, text):
-        if self.DroidInspect_ime.connected:
-            self.DroidInspect_ime.input_text(text=text, mode=0)
+        if self.droidbot_ime.connected:
+            self.droidbot_ime.input_text(text=text, mode=0)
         else:
             self.logger.warning("`adb shell input text` doesn't support setting text, appending instead.")
             self.adb.type(text)
@@ -880,8 +880,8 @@ class Device(object):
                 return views
             else:
                 self.logger.warning("Failed to get views using OpenCV.")
-        if self.DroidInspect_app and self.adapters[self.DroidInspect_app]:
-            views = self.DroidInspect_app.get_views()
+        if self.droidbot_app and self.adapters[self.droidbot_app]:
+            views = self.droidbot_app.get_views()
             if views:
                 return views
             else:
